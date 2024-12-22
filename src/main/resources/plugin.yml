@@ -1,0 +1,8 @@
+name: AxionBridge
+version: '1.0.0'
+main: com.axionspire.axionbridge.AxionBridge
+api-version: '1.21'
+prefix: AxionSpire API
+authors: [ Aelithron ]
+description: The Minecraft connector to the AxionSpire API.
+website: https://github.com/AxionSpire/AxionBridge

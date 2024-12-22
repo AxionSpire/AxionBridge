@@ -1,0 +1,21 @@
+# AxionBridge by AxionSpire
+# This plugin is used to link Minecraft with the AxionSpire API
+# https://github.com/AxionSpire/AxionBridge
+
+# API Configuration settings
+api:
+  # The AxionSpire API URL
+  # This is the URL of a server running the AxionSpire API
+  # The API is open source and can be found here: https://github.com/AxionSpire/api
+  url: "https://api.axionspire.net"
+
+  # The API key, used to authenticate to the API.
+  # This is provided in the API server's environment variables.
+  key: "PLACEHOLDER"
+
+# Plugin Prefix
+# Color codes supported here, guide: https://wiki.ess3.net/mc
+prefix: "&8[&6&lAxionBridge&r&8]"
+
+# Should the plugin check for updates?
+CheckForUpdates: true
