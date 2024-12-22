@@ -28,7 +28,40 @@ class BridgeTools {
     }
 
     public String getPrefix() {
+        if (plugin.getConfig().getString("Prefix") == null) { return ""; }
         return (ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(plugin.getConfig().getString("Prefix"))) + " ");
+    }
+
+    URI getAPIURL() {
+        if (plugin.getConfig().getString("api.url") == null) { return null; }
+        return URI.create(Objects.requireNonNull(plugin.getConfig().getString("api.url")));
+    }
+
+    String getAPIKey() {
+        if (plugin.getConfig().getString("api.key") == null) { return null; }
+        return Objects.requireNonNull(plugin.getConfig().getString("api.key"));
+    }
+
+    void checkConfig() {
+        plugin.reloadConfig();
+        boolean changed = false;
+        if (getAPIURL() == null) {
+            plugin.getLogger().severe("You must set your AxionSpire API URL in the config file.");
+        }
+        if (getAPIKey() == null || Objects.equals(getAPIKey(), "PLACEHOLDER")) {
+            plugin.getLogger().severe("You must set your AxionSpire API key in the config file.");
+        }
+        if (plugin.getConfig().getString("Prefix") == null) {
+            plugin.getLogger().warning("No message prefix was set in the config, setting a default...");
+            plugin.getConfig().set("Prefix", "&8[&6&lAxionBridge&r&8]");
+            changed = true;
+        }
+        if (!plugin.getConfig().isSet("CheckForUpdates")) {
+            plugin.getLogger().warning("No check for updates value was set in the config, setting a default...");
+            plugin.getConfig().set("CheckForUpdates", true);
+            changed = true;
+        }
+        if (changed) { plugin.saveConfig(); }
     }
 
     public void checkForUpdates() throws JsonProcessingException {
@@ -58,16 +91,6 @@ class BridgeTools {
                 }, 60L);
             }
         }
-    }
-
-    URI getAPIURL() {
-        if (plugin.getConfig().getString("api.url") == null) { return null; }
-        return URI.create(Objects.requireNonNull(plugin.getConfig().getString("api.url")));
-    }
-
-    String getAPIKey() {
-        if (plugin.getConfig().getString("api.key") == null) { return null; }
-        return Objects.requireNonNull(plugin.getConfig().getString("api.key"));
     }
 }
 
