@@ -19,6 +19,9 @@ repositories {
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
 }
 
 def targetJavaVersion = 21

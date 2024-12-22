@@ -1,5 +1,8 @@
 package com.axionspire.axionbridge;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bukkit.ChatColor;
 
 import java.io.IOException;
@@ -28,7 +31,7 @@ class BridgeTools {
         return (ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(plugin.getConfig().getString("Prefix"))) + " ");
     }
 
-    public void checkForUpdates() {
+    public void checkForUpdates() throws JsonProcessingException {
         if (plugin.getConfig().getBoolean("CheckForUpdates")) {
             HttpRequest check = HttpRequest.newBuilder()
                     .GET()
@@ -43,7 +46,9 @@ class BridgeTools {
             }
             assert response != null;
             String json = response.body();
-            String latestVersion = json.substring(json.indexOf("tag_name") + 11, json.indexOf('"', json.indexOf("tag_name") + 11));
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode jsonNode = mapper.readTree(json);
+            String latestVersion = jsonNode.get("tag_name").asText();
             String version = "v" + plugin.getDescription().getVersion();
             if (!version.equals(latestVersion)) {
                 plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, () -> {
