@@ -1,4 +1,4 @@
-package com.axionspire.axionbridge;
+package net.axionspire.axionbridge;
 
 import org.bukkit.event.Listener;
 

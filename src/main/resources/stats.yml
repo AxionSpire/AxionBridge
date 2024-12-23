@@ -1,0 +1,7 @@
+# AxionBridge by AxionSpire - Stats Configuration
+# More info on this file is in the plugin wiki: https://github.com/AxionSpire/AxionBridge/wiki/Registering-a-Stat
+
+xp_levels: # Stat ID, pick any unique value.
+  check: "online" # For checking inventories, this cannot be set to all.
+  source: "registered" # This tells AxionBridge to use the internal registry.
+  call: "Base:ExperienceLevels" # This is the registered method's ID, which should be provided by the plugin you want to pull from. "Base:ExperienceLevels" is a built-in method.

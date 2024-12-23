@@ -1,6 +1,6 @@
 name: AxionBridge
 version: '1.0.0'
-main: com.axionspire.axionbridge.AxionBridge
+main: net.axionspire.axionbridge.AxionBridge
 api-version: '1.21'
 prefix: AxionSpire API
 authors: [ Aelithron ]

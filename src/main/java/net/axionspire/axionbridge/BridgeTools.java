@@ -1,4 +1,4 @@
-package com.axionspire.axionbridge;
+package net.axionspire.axionbridge;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -16,18 +16,18 @@ class BridgeTools {
     private AxionBridge plugin;
     private static BridgeTools instance;
 
-    public static BridgeTools getInstance() {
+    static BridgeTools getInstance() {
         if (instance == null) {
             instance = new BridgeTools();
         }
         return instance;
     }
 
-    public void setPlugin(AxionBridge plugin) {
+    void setPlugin(AxionBridge plugin) {
         this.plugin = plugin;
     }
 
-    public String getPrefix() {
+    String getPrefix() {
         if (plugin.getConfig().getString("Prefix") == null) { return ""; }
         return (ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(plugin.getConfig().getString("Prefix"))) + " ");
     }
@@ -61,10 +61,15 @@ class BridgeTools {
             plugin.getConfig().set("CheckForUpdates", true);
             changed = true;
         }
+        if (plugin.getConfig().getInt("StatsTimer") > 0) {
+            plugin.getLogger().warning("No stats timer value was set in the config, setting a default...");
+            plugin.getConfig().set("StatsTimer", 300);
+            changed = true;
+        }
         if (changed) { plugin.saveConfig(); }
     }
 
-    public void checkForUpdates() throws JsonProcessingException {
+    void checkForUpdates() throws JsonProcessingException {
         if (plugin.getConfig().getBoolean("CheckForUpdates")) {
             HttpRequest check = HttpRequest.newBuilder()
                     .GET()
@@ -74,7 +79,7 @@ class BridgeTools {
             try {
                 response = HttpClient.newHttpClient().send(check, HttpResponse.BodyHandlers.ofString());
             } catch (IOException | InterruptedException e) {
-                plugin.getLogger().info("Failed to check for updates.");
+                plugin.getLogger().warning("Failed to check for updates.");
                 e.printStackTrace();
             }
             assert response != null;

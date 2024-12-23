@@ -19,3 +19,6 @@ prefix: "&8[&6&lAxionBridge&r&8]"
 
 # Should the plugin check for updates?
 CheckForUpdates: true
+
+# How often should stats be pulled from players and uploaded (in seconds)?
+StatsTimer: 300
