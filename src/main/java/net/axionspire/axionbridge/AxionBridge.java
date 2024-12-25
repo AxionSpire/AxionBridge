@@ -59,7 +59,8 @@ public final class AxionBridge extends JavaPlugin {
                 .GET()
                 .uri(BridgeTools.getInstance().getAPIURL())
                 .header("Content-Type", "application/json")
-                .header("AxionBridge-Version", getDescription().getVersion())
+                .header("User-Agent", "AxionBridge/" + getDescription().getVersion() + " (Java/" + System.getProperty("java.version") + ")")
+                .header("Authorization", "Bearer " + BridgeTools.getInstance().getAPIKey())
                 .build();
         HttpResponse<String> response;
         try {
