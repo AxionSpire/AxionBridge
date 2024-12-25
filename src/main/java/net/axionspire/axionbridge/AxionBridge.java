@@ -83,6 +83,7 @@ public final class AxionBridge extends JavaPlugin {
         }
         String serverVersion = jsonNode.get("version").asText();
         String serverName = jsonNode.get("server").asText();
+        boolean authValid = jsonNode.get("auth_valid").asBoolean();
         if (!Objects.equals(serverName, "AxionSpire API")) {
             getLogger().severe("The server provided (" + BridgeTools.getInstance().getAPIURL() + ") does not appear to be an AxionSpire API server.");
             getLogger().info("Server name (from the API): " + serverName);
@@ -90,6 +91,11 @@ public final class AxionBridge extends JavaPlugin {
         }
         getLogger().info("Connected to the AxionSpire API server '" +  BridgeTools.getInstance().getAPIURL() + "' successfully.");
         getLogger().info("API Server version: v" + serverVersion);
+        if (authValid) {
+            getLogger().info("API Key is valid.");
+        } else {
+            getLogger().severe("API Key is invalid. Please check your key in the config file.");
+        }
     }
 
     public void reloadStatsConfig() {
