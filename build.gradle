@@ -15,10 +15,15 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven {
+        name = "placeholderapi"
+        url = "https://repo.extendedclip.com/releases/"
+    }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.21-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.2")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")

@@ -42,6 +42,11 @@ class BridgeTools {
         return Objects.requireNonNull(plugin.getConfig().getString("api.key"));
     }
 
+    String getServerID() {
+        if (plugin.getConfig().getString("api.serverID") == null) { return null; }
+        return Objects.requireNonNull(plugin.getConfig().getString("api.serverID"));
+    }
+
     void checkConfig() {
         plugin.reloadConfig();
         boolean changed = false;
@@ -50,6 +55,9 @@ class BridgeTools {
         }
         if (getAPIKey() == null || Objects.equals(getAPIKey(), "PLACEHOLDER")) {
             plugin.getLogger().severe("You must set your AxionSpire API key in the config file.");
+        }
+        if (getServerID() == null) {
+            plugin.getLogger().severe("You must set your server ID in the config file.");
         }
         if (plugin.getConfig().getString("Prefix") == null) {
             plugin.getLogger().warning("No message prefix was set in the config, setting a default...");
@@ -61,7 +69,7 @@ class BridgeTools {
             plugin.getConfig().set("CheckForUpdates", true);
             changed = true;
         }
-        if (plugin.getConfig().getInt("StatsTimer") > 0) {
+        if (plugin.getConfig().getInt("StatsTimer") <= 0) {
             plugin.getLogger().warning("No stats timer value was set in the config, setting a default...");
             plugin.getConfig().set("StatsTimer", 300);
             changed = true;

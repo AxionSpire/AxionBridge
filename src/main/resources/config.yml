@@ -13,12 +13,19 @@ api:
   # This is provided in the API server's environment variables.
   key: "PLACEHOLDER"
 
+  # The server ID, used when uploading stats.
+  # You can enter any value here, but it will be publicly visible for anyone calling the API.
+  serverID: "server"
+
 # Plugin Prefix
 # Color codes supported here, guide: https://wiki.ess3.net/mc
-prefix: "&8[&6&lAxionBridge&r&8]"
+Prefix: "&8[&6&lAxionBridge&r&8]"
 
 # Should the plugin check for updates?
 CheckForUpdates: true
 
 # How often should stats be pulled from players and uploaded (in seconds)?
 StatsTimer: 300
+
+# Should there be extra debug logging?
+Debug: false

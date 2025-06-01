@@ -1,16 +1,17 @@
 package net.axionspire.axionbridge;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+
+import java.util.*;
 
 public class APIStatManager {
     private static APIStatManager instance;
     private AxionBridge plugin;
 
-    private List<RegisteredStatProvider> registeredProviders = new ArrayList<>();
-    private List<APIStat> registeredStats = new ArrayList<>();
+    private final List<RegisteredStatProvider> registeredProviders = new ArrayList<>();
+    private final List<APIStat> registeredStats = new ArrayList<>();
 
     public static APIStatManager getInstance() {
         if (instance == null) {
@@ -63,8 +64,51 @@ public class APIStatManager {
     }
 
     void pullStats() {
+        if (registeredStats.isEmpty()) {
+            plugin.getLogger().warning("No API stats registered, skipping pulling stats.");
+            return;
+        }
         for (APIStat stat : registeredStats) {
-            // TODO: Pull stat data
+            HashMap<UUID, String> playerStats = new HashMap<>();
+            if (plugin.getConfig().getBoolean("Debug")) {
+                plugin.getLogger().info("Debug message: Pulling stat '" + stat.getStatID() + "' from source '" + stat.getResolveMethod() + "', checking " + stat.getCheckedPlayers() + " players.");
+                if (stat.getPlaceholder() != null) {
+                    plugin.getLogger().info("Debug message: Stat placeholder: " + stat.getPlaceholder());
+                } else if (stat.getRegisteredStatProvider() != null) {
+                    plugin.getLogger().info("Debug message: Stat registered provider: " + stat.getRegisteredStatProvider().getMethodID());
+                }
+            }
+            List<OfflinePlayer> players = new ArrayList<>();
+            if (stat.getCheckedPlayers() == APIStat.CheckedPlayers.ALL) {
+                players.addAll(Arrays.stream(plugin.getServer().getOfflinePlayers()).toList());
+            } else if (stat.getCheckedPlayers() == APIStat.CheckedPlayers.ONLINE) {
+                for (Player player : plugin.getServer().getOnlinePlayers()) {
+                    if (player.isOnline()) {
+                        players.add(player);
+                    }
+                }
+            }
+            if (stat.getResolveMethod() == APIStat.ResolveMethod.PLACEHOLDERAPI) {
+                for (OfflinePlayer player : players) {
+                    playerStats.put(player.getUniqueId(), PlaceholderAPI.setPlaceholders(player, stat.getPlaceholder()));
+                }
+            } else if (stat.getResolveMethod() == APIStat.ResolveMethod.REGISTERED) {
+                for (OfflinePlayer player : players) {
+                    playerStats.put(player.getUniqueId(), stat.getRegisteredStatProvider().pullStats(player));
+                }
+            }
+            try {
+                if (plugin.getConfig().getBoolean("Debug")) {
+                    plugin.getLogger().info("Debug message: Pulled stats for " + playerStats.size() + " players.");
+                }
+                if (playerStats.isEmpty()) {
+                    continue;
+                }
+                plugin.uploadStat(stat.getStatID(), playerStats);
+                if (plugin.getConfig().getBoolean("Debug")) {
+                    plugin.getLogger().info("Debug message: Uploaded stats for stat '" + stat.getStatID() + "'.");
+                }
+            } catch (Exception ignored) {}
         }
     }
 }

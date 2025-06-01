@@ -3,6 +3,8 @@ package net.axionspire.axionbridge;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -11,7 +13,9 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class AxionBridge extends JavaPlugin {
     // Extra Files
@@ -24,7 +28,7 @@ public final class AxionBridge extends JavaPlugin {
         // Configs
         getConfig().options().copyDefaults();
         saveDefaultConfig();
-        statsConfigFile = new File(getDataFolder(), "data.yml");
+        statsConfigFile = new File(getDataFolder(), "stats.yml");
         if (!statsConfigFile.exists()) {
             saveResource("stats.yml", false);
         }
@@ -45,8 +49,8 @@ public final class AxionBridge extends JavaPlugin {
         getServer().getScheduler().scheduleSyncDelayedTask(this, this::testConnection, 40L);
         getServer().getScheduler().scheduleSyncDelayedTask(this, () -> { APIStatManager.getInstance().loadAPIStats(); }, 60L);
 
-        long statTimer = getConfig().getInt("StatTimer") * 20L;
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> { APIStatManager.getInstance().pullStats(); }, statTimer, statTimer);
+        long statTimer = getConfig().getInt("StatsTimer") * 20L;
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> { APIStatManager.getInstance().pullStats(); }, 80L, statTimer);
     }
 
     @Override
@@ -105,6 +109,40 @@ public final class AxionBridge extends JavaPlugin {
         try {
             statsConfig.save(new File(getDataFolder(), "stats.yml"));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void uploadStat(String statID, HashMap<UUID, String> statData) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        root.put("serverID", getConfig().getString("api.serverID"));
+        root.put("statID", statID);
+        ArrayNode records = mapper.createArrayNode();
+        for (UUID uuid : statData.keySet()) {
+            ObjectNode record = mapper.createObjectNode();
+            record.put("uuid", uuid.toString());
+            record.put("value", statData.get(uuid));
+            records.add(record);
+        }
+        root.set("records", records);
+        String jsonOutput = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+
+        HttpRequest upload = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(jsonOutput))
+                .uri(BridgeTools.getInstance().getAPIURL().resolve("/server/stats"))
+                .header("Content-Type", "application/json")
+                .header("User-Agent", "AxionBridge/" + getDescription().getVersion() + " (Java/" + System.getProperty("java.version") + ")")
+                .header("Authorization", "Bearer " + BridgeTools.getInstance().getAPIKey())
+                .build();
+        try {
+            HttpResponse<String> res = HttpClient.newHttpClient().send(upload, HttpResponse.BodyHandlers.ofString());
+            if (res.statusCode() != 200) {
+                getLogger().severe("Failed to upload stats to the AxionSpire API server for stat '" + statID + "'. Status code: " + res.statusCode());
+                getLogger().severe("Response: " + res.body());
+            }
+        } catch (IOException | InterruptedException e) {
+            getLogger().severe("Failed to upload stats to the AxionSpire API server.");
             e.printStackTrace();
         }
     }

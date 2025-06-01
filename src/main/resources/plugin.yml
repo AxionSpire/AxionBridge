@@ -1,8 +1,10 @@
 name: AxionBridge
-version: '1.0.0'
+version: '${version}'
 main: net.axionspire.axionbridge.AxionBridge
 api-version: '1.21'
 prefix: AxionSpire API
 authors: [ Aelithron ]
+softdepend:
+  - PlaceholderAPI
 description: The Minecraft connector to the AxionSpire API.
 website: https://github.com/AxionSpire/AxionBridge
